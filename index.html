@@ -1,32 +1,50 @@
 import os
 
-# HTML base com um visual limpo
-html_template = """
-<!DOCTYPE html>
-<html>
+# Caminho onde estão as pastas dos alunos
+caminho_base = '.' 
+
+# HTML com estilo embutido (sem usar chaves que conflitam com format)
+html_topo = """<!DOCTYPE html>
+<html lang="pt-br">
 <head>
-    <title>Arquivos do Projeto</title>
+    <meta charset="UTF-8">
+    <title>Portal de Projetos - Alunos</title>
     <style>
-        body {{ font-family: sans-serif; padding: 20px; background: #f4f4f4; }}
-        ul {{ list-style: none; padding: 0; }}
-        li {{ background: white; margin: 5px 0; padding: 10px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }}
-        a {{ text-decoration: none; color: #007bff; font-weight: bold; }}
-        a:hover {{ color: #0056b3; }}
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef2f7; padding: 40px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 12px; shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        .card { background: #f8f9fa; padding: 15px; border: 1px solid #ddd; border-radius: 8px; text-align: center; transition: 0.3s; }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-color: #007bff; }
+        a { text-decoration: none; color: #007bff; font-weight: bold; word-break: break-all; }
     </style>
 </head>
 <body>
-    <h1>📂 Lista de Arquivos</h1>
-    <ul>
-        {links}
-    </ul>
+    <div class="container">
+        <h1>🚀 Projetos dos Alunos</h1>
+        <div class="grid">
+"""
+
+html_rodape = """
+        </div>
+    </div>
 </body>
 </html>
 """
 
-files = [f for f in os.listdir('.') if f != 'index.html']
-links = "".join([f'<li><a href="{f}">{f}</a></li>' for f in files])
+# Listar apenas diretórios
+pastas = [d for d in os.listdir(caminho_base) if os.path.isdir(os.path.join(caminho_base, d))]
+pastas.sort()
 
-with open("index.html", "w") as f:
-    f.write(html_template.format(links=links))
+itens = []
+for pasta in pastas:
+    # Cria o link relativo. Se o aluno acessa via lab.inetz.com.br/nome-do-aluno
+    # o link aqui deve ser apenas o nome da pasta.
+    itens.append(f'<div class="card"><a href="{pasta}/">{pasta}</a></div>')
 
-print("✅ index.html gerado com sucesso!")
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html_topo)
+    f.write("\n".join(itens))
+    f.write(html_rodape)
+
+print(f"✅ Portal gerado com {len(pastas)} alunos!")
