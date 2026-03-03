@@ -1,0 +1,32 @@
+import os
+
+# HTML base com um visual limpo
+html_template = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Arquivos do Projeto</title>
+    <style>
+        body {{ font-family: sans-serif; padding: 20px; background: #f4f4f4; }}
+        ul {{ list-style: none; padding: 0; }}
+        li {{ background: white; margin: 5px 0; padding: 10px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }}
+        a {{ text-decoration: none; color: #007bff; font-weight: bold; }}
+        a:hover {{ color: #0056b3; }}
+    </style>
+</head>
+<body>
+    <h1>📂 Lista de Arquivos</h1>
+    <ul>
+        {links}
+    </ul>
+</body>
+</html>
+"""
+
+files = [f for f in os.listdir('.') if f != 'index.html']
+links = "".join([f'<li><a href="{f}">{f}</a></li>' for f in files])
+
+with open("index.html", "w") as f:
+    f.write(html_template.format(links=links))
+
+print("✅ index.html gerado com sucesso!")
