@@ -1,17 +1,30 @@
-name: Deploy Front-End Estático
+name: Deploy Turing Stack
 on:
   push:
     branches: [ main ]
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Publicar para Inetz
-        uses: appleboy/scp-action@v0.1.7
+      - name: Checkout Código
+        uses: actions/checkout@v4
+
+      - name: Mestre de Obras (Preparar Terreno)
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ubuntu
           key: ${{ secrets.SSH_KEY }}
-          source: "."
-          target: "/var/inetpub/wwwroot/projetos/${{ secrets.ALUNO_RA }}/front/${{ secrets.ALUNO_PROJETO }}"
+          script: |
+            # 1, 2 e 3: Garantir Docker, Swarm, Redes e Pastas
+            if ! [ -x "$(command -v docker)" ]; then curl -fsSL https://get.docker.com | sh && sudo usermod -aG docker ubuntu; fi
+            if [ "$(sudo docker info --format '{{.Swarm.LocalNodeState}}')" != "active" ]; then sudo docker swarm init; fi
+            sudo docker network ls | grep dockermaster || sudo docker network create -d overlay dockermaster
+            sudo mkdir -p /var/inetpub/wwwroot/projetos
+            sudo chown -R ubuntu:ubuntu /var/inetpub/wwwroot/projetos
+
+      - name: Avisar Portainer (A Mágica)
+        run: |
+          # Este comando dá o "cutucão" no Portainer para ele ler o arquivo do Git
+        curl -X POST "${{ secrets.PORTAINER_WEBHOOK_URL }}"
