@@ -1,30 +1,36 @@
-name: Deploy Turing Stack
+name: Deploy Projeto Estatico Aluno
+
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
+
+# Definimos as variáveis de ambiente para facilitar a manutenção
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Código
+      - name: Checkout do Código
         uses: actions/checkout@v4
 
-      - name: Mestre de Obras (Preparar Terreno)
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Enviar HTML/CSS para o Servidor
+        uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.SSH_HOST }}
+          host: ${{ vars.SSH_HOST }}
           username: ubuntu
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            # 1, 2 e 3: Garantir Docker, Swarm, Redes e Pastas
-            if ! [ -x "$(command -v docker)" ]; then curl -fsSL https://get.docker.com | sh && sudo usermod -aG docker ubuntu; fi
-            if [ "$(sudo docker info --format '{{.Swarm.LocalNodeState}}')" != "active" ]; then sudo docker swarm init; fi
-            sudo docker network ls | grep dockermaster || sudo docker network create -d overlay dockermaster
-            sudo mkdir -p /var/inetpub/wwwroot/projetos
-            sudo chown -R ubuntu:ubuntu /var/inetpub/wwwroot/projetos
+          key: ${{ secrets.key_alunos }}
+          # Envia tudo (*), mas você pode filtrar apenas arquivos específicos
+          source: "./*" 
+          # O caminho final será: /var/inetpub/wwwroot/projetos/202412345/site-turing/
+          target: "${{ vars.REMOTE_TARGET }}/${{ vars.ALUNO_RA }}/${{ vars.PROJETO_ALUNO }}/"
+          strip_components: 0 # Mantém a estrutura de pastas se houver subpastas (css, img)
 
-      - name: Avisar Portainer (A Mágica)
-        run: |
-          # Este comando dá o "cutucão" no Portainer para ele ler o arquivo do Git
-        curl -X POST "${{ secrets.PORTAINER_WEBHOOK_URL }}"
+      - name: Ajustar Permissões (Opcional)
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ vars.SSH_HOST }}
+          username: ubuntu
+          key: ${{ secrets.key_alunos }}
+          script: |
+            sudo chown -R ubuntu:www-data ${{ vars.REMOTE_TARGET }}/${{ vars.ALUNO_RA }}
+            chmod -R 755 ${{ vars.REMOTE_TARGET }}/${{ vars.ALUNO_RA }}
