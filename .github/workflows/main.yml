@@ -4,8 +4,6 @@ on:
   push:
     branches: [ main, master ]
 
-# Definimos as variáveis de ambiente para facilitar a manutenção
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -13,17 +11,27 @@ jobs:
       - name: Checkout do Código
         uses: actions/checkout@v4
 
+      # --- NOVO PASSO: Configurar Python ---
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      # --- NOVO PASSO: Gerar o Index Dinâmico ---
+      - name: Gerar Portal de Projetos
+        run: |
+          python3 generate_index.py
+
       - name: Enviar HTML/CSS para o Servidor
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ vars.SSH_HOST }}
           username: ubuntu
           key: ${{ secrets.SSH_KEY}}
-          # Envia tudo (*), mas você pode filtrar apenas arquivos específicos
+          # O source agora inclui o index.html gerado no passo anterior
           source: "./*" 
-          # O caminho final será: /var/inetpub/wwwroot/projetos/202412345/
           target: "/var/inetpub/wwwroot/projetos/${{ vars.ALUNO_RA }}/${{ vars.ALUNO_PROJETO }}/"
-          strip_components: 0 # Mantém a estrutura de pastas se houver subpastas (css, img)
+          strip_components: 0
 
       - name: Ajustar Permissões (Opcional)
         uses: appleboy/ssh-action@master
