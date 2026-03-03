@@ -30,7 +30,7 @@ jobs:
         with:
           host: ${{ vars.SSH_HOST }}
           username: ubuntu
-          key: ${{ secrets.key_alunos }}
+          key: ${{ secrets.SSH_KEY }}
           script: |
             sudo chown -R ubuntu:www-data ${{ vars.REMOTE_TARGET }}/${{ vars.ALUNO_RA }}
             chmod -R 755 ${{ vars.REMOTE_TARGET }}/${{ vars.ALUNO_RA }}
