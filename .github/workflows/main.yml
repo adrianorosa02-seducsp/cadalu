@@ -18,7 +18,7 @@ jobs:
         with:
           host: ${{ vars.SSH_HOST }}
           username: ubuntu
-          key: ${{ secrets.KEY_ALUNO }}
+          key: ${{ secrets.SSH_KEY}}
           # Envia tudo (*), mas você pode filtrar apenas arquivos específicos
           source: "./*" 
           # O caminho final será: /var/inetpub/wwwroot/projetos/202412345/site-turing/
