@@ -1,0 +1,17 @@
+name: Deploy Front-End Estático
+on:
+  push:
+    branches: [ main ]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publicar para Inetz
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ubuntu
+          key: ${{ secrets.SSH_KEY }}
+          source: "."
+          target: "/var/inetpub/wwwroot/projetos/${{ secrets.ALUNO_RA }}/front/${{ secrets.ALUNO_PROJETO }}"
