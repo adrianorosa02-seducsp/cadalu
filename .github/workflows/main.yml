@@ -22,7 +22,7 @@ jobs:
           # Envia tudo (*), mas você pode filtrar apenas arquivos específicos
           source: "./*" 
           # O caminho final será: /var/inetpub/wwwroot/projetos/202412345/site-turing/
-          target: "${{ vars.REMOTE_TARGET }}/${{ vars.ALUNO_RA }}/${{ vars.PROJETO_ALUNO }}/"
+          target: "${{ vars.REMOTE_TARGET }}/${{ vars.ALUNO_RA }}/${{ vars.ALUNO_PROJETO }}/"
           strip_components: 0 # Mantém a estrutura de pastas se houver subpastas (css, img)
 
       - name: Ajustar Permissões (Opcional)
