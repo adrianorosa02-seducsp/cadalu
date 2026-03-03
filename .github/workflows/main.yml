@@ -1,4 +1,4 @@
-name: Deploy Front-End Estático.
+name: Deploy Front-End Estático
 on:
   push:
     branches: [ main ]
